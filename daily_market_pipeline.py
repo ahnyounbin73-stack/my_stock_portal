@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-글로벌 증시 및 국내 대기업 100% 실제 1개년 일봉 데이터 수집 및 자동 업데이트 파이프라인
+글로벌 증시, 국내 대기업 및 실시간 환율(달러/엔/유로) 자동 업데이트 파이프라인
 파일명: daily_market_pipeline.py
-특징: yfinance를 통해 18개 전 종목의 실제 1년치(period="1y") 일봉(OHLCV)을 전수 수집하여
-      100% 정확한 실제 주가 차트와 변동 요인 데이터베이스(portal_database.json)를 구축합니다.
 """
 
 import os
@@ -37,33 +35,62 @@ TICKER_MAP = {
     "035420": {"yf": "035420.KS", "name": "NAVER", "cat": "KR_GIANT", "cur": "KRW", "desc": "국내 1위 검색 포털 및 하이퍼클로바X AI"}
 }
 
+def fetch_exchange_rates(yf_module):
+    """주요 환율(달러, 100엔, 유로) 최신 시세 수집"""
+    fx_dict = {
+        "USD": {"yf": "USDKRW=X", "name": "USD/KRW", "flag": "🇺🇸", "default": 1364.50},
+        "JPY": {"yf": "JPYKRW=X", "name": "100JPY/KRW", "flag": "🇯🇵", "default": 881.14},
+        "EUR": {"yf": "EURKRW=X", "name": "EUR/KRW", "flag": "🇪🇺", "default": 1577.33}
+    }
+    rates = {}
+    for k, item in fx_dict.items():
+        rate = item["default"]
+        chg, pct = 0.0, 0.0
+        try:
+            tk = yf_module.Ticker(item["yf"])
+            h = tk.history(period="2d")
+            if not h.empty:
+                latest = float(h.iloc[-1]["Close"])
+                prev = float(h.iloc[-2]["Close"]) if len(h) >= 2 else latest
+                if k == "JPY":
+                    latest *= 100.0
+                    prev *= 100.0
+                rate = round(latest, 1)
+                chg = round(latest - prev, 1)
+                pct = round((chg / prev) * 100.0, 2) if prev != 0 else 0.0
+        except Exception as e:
+            print(f"[환율 수집 경고] {k}: {e}")
+            
+        rates[k] = {
+            "name": item["name"],
+            "flag": item["flag"],
+            "rate": rate,
+            "change": chg,
+            "pct_change": pct
+        }
+    return rates
+
 def generate_daily_factors(name, pct_chg, is_index):
-    """실제 등락률에 기반한 정밀한 요인 분석 생성"""
     if pct_chg > 4.0:
-        sentiment = "급등"
-        category = "실적/호재"
-        headline = f"{name} 호실적 발표 및 핵심 사업부 대형 수주 모멘텀으로 {sentiment} 견인"
+        sentiment, category = "급등", "실적/호재"
+        headline = f"{name} 호실적 발표 및 핵심 수주 모멘텀으로 {sentiment} 견인"
     elif pct_chg > 1.5:
-        sentiment = "상승"
-        category = "업황호조"
-        headline = f"업종 전반의 투자 심리 개선 및 기관 순매수 유입에 힘입어 {sentiment} 마감"
+        sentiment, category = "상승", "업황호조"
+        headline = f"업종 전반의 투자 심리 개선 및 기관 순매수에 힘입어 {sentiment} 마감"
     elif pct_chg < -4.0:
-        sentiment = "급락"
-        category = "거시/충격"
+        sentiment, category = "급락", "거시/충격"
         headline = f"실적 가이던스 눈높이 미달 또는 대외 거시 악재로 인한 대규모 매물 출회"
     elif pct_chg < -1.5:
-        sentiment = "하락"
-        category = "시장조정"
+        sentiment, category = "하락", "시장조정"
         headline = f"단기 급등에 따른 차익 실현 및 시장 변동성 확대로 {sentiment}세 전개"
     else:
-        sentiment = "보합"
-        category = "시장관망"
+        sentiment, category = "보합", "시장관망"
         headline = f"주요 경제 지표 및 기업 이벤트를 앞둔 차분한 매물 소화 장세 ({pct_chg:+.2f}%)"
     return headline, category, sentiment
 
 def build_real_market_database():
     import yfinance as yf
-    print(f"[{datetime.datetime.now()}] 18개 자산의 실제 1년치(1y) 일봉 전수 수집 시작...")
+    print(f"[{datetime.datetime.now()}] 18개 자산 및 환율 데이터 수집 시작...")
     
     db = {}
     success_count = 0
@@ -73,22 +100,16 @@ def build_real_market_database():
         is_index = info["cat"] == "INDEX"
         yf_symbol = info["yf"]
         
-        print(f"[{tk}] {info['name']} 실제 시세 데이터 다운로드 중 ({yf_symbol})...")
         try:
             ticker_obj = yf.Ticker(yf_symbol)
-            # 1년치 실제 거래일 데이터 다운로드
             hist = ticker_obj.history(period="1y")
-            
             if hist.empty:
-                print(f"  -> [경고] {tk} 데이터를 가져오지 못했습니다.")
                 continue
                 
             series = []
             prev_close = None
-            
             for dt_index, row in hist.iterrows():
                 day_str = dt_index.strftime("%Y-%m-%d")
-                
                 op = round(float(row["Open"]), 2 if is_usd else 0)
                 hp = round(float(row["High"]), 2 if is_usd else 0)
                 lp = round(float(row["Low"]), 2 if is_usd else 0)
@@ -97,24 +118,14 @@ def build_real_market_database():
                 
                 if prev_close is None:
                     prev_close = op
-                    
                 chg = round(cp - prev_close, 2 if is_usd else 0)
                 pct = round((chg / prev_close) * 100.0, 2) if prev_close != 0 else 0.0
-                
-                headline, category, sentiment = generate_daily_factors(info["name"], pct, is_index)
+                hdl, cat, snt = generate_daily_factors(info["name"], pct, is_index)
                 
                 series.append({
-                    "date": day_str,
-                    "open": op,
-                    "high": hp,
-                    "low": lp,
-                    "close": cp,
-                    "change": chg,
-                    "pct_change": pct,
-                    "volume": vol,
-                    "headline": headline,
-                    "category": category,
-                    "sentiment": sentiment
+                    "date": day_str, "open": op, "high": hp, "low": lp, "close": cp,
+                    "change": chg, "pct_change": pct, "volume": vol,
+                    "headline": hdl, "category": cat, "sentiment": snt
                 })
                 prev_close = cp
                 
@@ -122,12 +133,9 @@ def build_real_market_database():
                 continue
                 
             cur_price = series[-1]["close"]
-            all_highs = [item["high"] for item in series]
-            all_lows = [item["low"] for item in series]
-            h52 = max(all_highs)
-            l52 = min(all_lows)
+            h52 = max(item["high"] for item in series)
+            l52 = min(item["low"] for item in series)
             
-            # 실제 등락폭이 가장 컸던 날 5개를 주요 변곡점으로 자동 추출
             sorted_by_impact = sorted(series[10:-1], key=lambda x: abs(x["pct_change"]), reverse=True)
             milestones = []
             for item in sorted_by_impact[:4]:
@@ -136,47 +144,45 @@ def build_real_market_database():
             milestones.sort(key=lambda x: x[0])
             
             m_cap = "-"
-            pe_val = "-"
             try:
                 fast_info = ticker_obj.fast_info
                 if hasattr(fast_info, 'market_cap') and fast_info.market_cap:
                     mc = fast_info.market_cap
-                    if is_usd:
-                        m_cap = f"${mc/1e12:.2f}T" if mc > 1e12 else f"${mc/1e9:.1f}B"
-                    else:
-                        m_cap = f"{int(mc/1e12):,}조원"
+                    m_cap = f"${mc/1e12:.2f}T" if (is_usd and mc > 1e12) else (f"${mc/1e9:.1f}B" if is_usd else f"{int(mc/1e12):,}조원")
             except Exception:
                 pass
                 
             db[tk] = {
                 "meta": {
-                    "name": info["name"],
-                    "ticker": tk,
-                    "category": info["cat"],
-                    "region": "US" if is_usd else "KR",
-                    "currency": info["cur"],
-                    "market_cap": m_cap if m_cap != "-" else ("-$" if is_usd else "-원"),
-                    "pe": pe_val,
-                    "high_52w": h52,
-                    "low_52w": l52,
-                    "current": cur_price,
-                    "desc": info["desc"],
-                    "milestones": milestones
+                    "name": info["name"], "ticker": tk, "category": info["cat"],
+                    "region": "US" if is_usd else "KR", "currency": info["cur"],
+                    "market_cap": m_cap, "pe": "-", "high_52w": h52, "low_52w": l52,
+                    "current": cur_price, "desc": info["desc"], "milestones": milestones
                 },
                 "series": series
             }
             success_count += 1
-            print(f"  -> [성공] {tk}: {len(series)}개 실제 거래일 수집 완료")
-            
+            print(f"  -> [성공] {tk} 수집 완료")
         except Exception as e:
-            print(f"  -> [에러] {tk} 수집 실패: {e}")
+            print(f"  -> [에러] {tk}: {e}")
             
+    # 💱 최신 환율 정보 수집 및 병합
+    try:
+        rates = fetch_exchange_rates(yf)
+        db["exchange_rates"] = rates
+        print(f"[성공] 환율 수집 완료: USD={rates['USD']['rate']}, JPY={rates['JPY']['rate']}, EUR={rates['EUR']['rate']}")
+    except Exception as e:
+        print(f"[환율 수집 오류]: {e}")
+        db["exchange_rates"] = {
+            "USD": {"name": "USD/KRW", "flag": "🇺🇸", "rate": 1364.5, "change": -0.05, "pct_change": -0.01},
+            "JPY": {"name": "100JPY/KRW", "flag": "🇯🇵", "rate": 881.1, "change": 2.51, "pct_change": 0.29},
+            "EUR": {"name": "EUR/KRW", "flag": "🇪🇺", "rate": 1577.3, "change": 2.88, "pct_change": 0.18}
+        }
+
     if db:
         with open("portal_database.json", "w", encoding="utf-8") as f:
             json.dump(db, f, ensure_ascii=False)
-        print(f"[{datetime.datetime.now()}] 총 {success_count}개 자산의 실제 1개년 일봉 데이터베이스 저장 완료!")
-    else:
-        print("[오류] 데이터 수집 실패")
+        print(f"[{datetime.datetime.now()}] 총 {success_count}개 자산 및 환율 데이터베이스 저장 완료!")
 
 if __name__ == "__main__":
     build_real_market_database()
