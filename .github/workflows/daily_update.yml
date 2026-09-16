@@ -1,0 +1,26 @@
+name: Daily Market Close Auto-Updater
+
+on:
+  schedule:
+    # 한국 장 마감 후: 평일 월~금 16:00 KST
+    - cron: '0 7 * * 1-5'
+    # 미국 장 마감 후: 평일 월~금 06:30 KST
+    - cron: '30 21 * * 1-5'
+  workflow_dispatch: # 관리자가 언제든 수동으로 즉시 실행 버튼을 누를 수 있음
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests yfinance
+      - run: python daily_market_pipeline.py
+      - run: |
+          git config --global user.name "Market-Bot"
+          git config --global user.email "bot@github.com"
+          git add portal_database.json
+          git commit -m "Auto Update Market Data" || exit 0
+          git push
