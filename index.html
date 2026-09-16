@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>글로벌 마켓 & 주식 인텔리전스 포털</title>
   <style>
     :root {
@@ -19,32 +19,32 @@
       --ma60: #a855f7;
       --ma120: #10b981;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg-dark); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
     
-    .portal-nav { background: #0d1322; border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-shrink: 0; }
+    .portal-nav { background: #0d1322; border-bottom: 1px solid var(--border); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-shrink: 0; }
     .nav-brand { display: flex; align-items: center; gap: 10px; }
     .brand-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-    .brand-title { font-size: 16px; font-weight: 800; color: #fff; }
+    .brand-title { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
     
-    .search-container { flex: 1; max-width: 500px; position: relative; }
+    .search-container { flex: 1; max-width: 480px; position: relative; }
     .search-box { width: 100%; background: #1a2234; border: 1px solid var(--border); border-radius: 20px; padding: 8px 16px 8px 36px; font-size: 13px; color: #fff; outline: none; }
     .search-box:focus { border-color: var(--accent); }
     .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px; }
-    .search-dropdown { position: absolute; top: 40px; left: 0; width: 100%; background: #1a2234; border: 1px solid var(--border); border-radius: 10px; max-height: 350px; overflow-y: auto; z-index: 1000; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    .search-item { padding: 9px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .search-dropdown { position: absolute; top: 42px; left: 0; width: 100%; background: #1a2234; border: 1px solid var(--border); border-radius: 10px; max-height: 320px; overflow-y: auto; z-index: 1000; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .search-item { padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
     .search-item:hover { background: #26334d; }
     
-    .subnav-bar { background: #0f172a; border-bottom: 1px solid var(--border); padding: 8px 24px; display: flex; align-items: center; gap: 14px; overflow-x: auto; flex-shrink: 0; }
-    .cat-tabs { display: flex; gap: 6px; border-right: 1px solid var(--border); padding-right: 14px; flex-shrink: 0; }
-    .cat-tab { background: transparent; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: pointer; white-space: nowrap; }
+    .subnav-bar { background: #0f172a; border-bottom: 1px solid var(--border); padding: 8px 20px; display: flex; align-items: center; gap: 12px; overflow-x: auto; flex-shrink: 0; }
+    .cat-tabs { display: flex; gap: 6px; border-right: 1px solid var(--border); padding-right: 12px; flex-shrink: 0; }
+    .cat-tab { background: transparent; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 6px; cursor: pointer; white-space: nowrap; }
     .cat-tab.active { color: #fff; background: var(--accent); }
     .ticker-chips { display: flex; align-items: center; gap: 8px; overflow-x: auto; }
-    .chip { background: #1e293b; border: 1px solid var(--border); color: #cbd5e1; font-size: 11px; padding: 4px 10px; border-radius: 14px; cursor: pointer; white-space: nowrap; }
+    .chip { background: #1e293b; border: 1px solid var(--border); color: #cbd5e1; font-size: 11px; padding: 4px 10px; border-radius: 14px; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
     .chip.active { background: #2563eb; color: #fff; font-weight: 700; border-color: #3b82f6; }
     
-    .entity-header { background: #111827; border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-    .entity-title-group { display: flex; align-items: baseline; gap: 10px; }
+    .entity-header { background: #111827; border-bottom: 1px solid var(--border); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .entity-title-group { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
     .entity-name { font-size: 18px; font-weight: 800; color: #fff; }
     .entity-ticker { font-size: 13px; color: var(--accent); font-weight: 700; }
     .metrics-row { display: flex; gap: 16px; font-size: 12px; }
@@ -52,20 +52,25 @@
     .metric-lbl { font-size: 10px; color: var(--text-muted); }
     .metric-val { font-weight: 700; }
     
-    .milestone-bar { background: #0b111e; border-bottom: 1px solid var(--border); padding: 6px 24px; display: flex; align-items: center; gap: 8px; overflow-x: auto; flex-shrink: 0; }
+    .milestone-bar { background: #0b111e; border-bottom: 1px solid var(--border); padding: 6px 20px; display: flex; align-items: center; gap: 8px; overflow-x: auto; flex-shrink: 0; }
     .ms-label { font-size: 11px; font-weight: 700; color: #f59e0b; white-space: nowrap; }
     .ms-btn { background: #1a2333; border: 1px solid #334155; color: #cbd5e1; padding: 3px 9px; border-radius: 12px; font-size: 11px; cursor: pointer; white-space: nowrap; }
     .ms-btn:hover { border-color: #f59e0b; color: #fff; }
     
     .workspace { display: flex; flex: 1; overflow: hidden; }
     .chart-section { flex: 1; display: flex; flex-direction: column; position: relative; background: #090d16; border-right: 1px solid var(--border); }
-    .chart-toolbar { background: #111827; border-bottom: 1px solid var(--border); padding: 6px 16px; display: flex; justify-content: space-between; font-size: 11px; }
-    .canvas-container { flex: 1; position: relative; cursor: crosshair; }
+    .chart-toolbar { background: #111827; border-bottom: 1px solid var(--border); padding: 6px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+    .canvas-container { flex: 1; position: relative; cursor: crosshair; min-height: 280px; }
     canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
     
     .analysis-panel { width: 440px; background: #111827; display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0; }
     .panel-top { background: #161f30; border-bottom: 1px solid var(--border); padding: 14px 18px; }
-    .panel-instruction { font-size: 11px; color: var(--accent); background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; }
+    .panel-instruction { font-size: 11px; color: var(--accent); background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; line-height: 1.4; }
+    
+    .mobile-controls { display: flex; gap: 8px; margin-bottom: 10px; }
+    .btn-nav-step { flex: 1; background: #1f2937; border: 1px solid var(--border); color: #fff; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
+    .btn-nav-step:active { background: var(--accent); }
+    
     .panel-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .panel-date { font-size: 17px; font-weight: 800; color: #fff; }
     .badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px; }
@@ -85,29 +90,48 @@
     .pillar-item { margin-top: 8px; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,0.08); }
     .pillar-hdr { font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 2px; }
     .pillar-txt { font-size: 11.5px; color: #cbd5e1; line-height: 1.45; }
+
+    @media (max-width: 768px) {
+      body { height: auto; overflow-y: auto; }
+      .portal-nav { flex-direction: column; align-items: stretch; gap: 10px; padding: 10px 14px; }
+      .nav-brand { justify-content: space-between; width: 100%; }
+      .search-container { max-width: 100%; width: 100%; }
+      .subnav-bar { padding: 8px 14px; }
+      .entity-header { flex-direction: column; align-items: flex-start; gap: 8px; padding: 10px 14px; }
+      .metrics-row { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .metric-cell { align-items: flex-start; }
+      .milestone-bar { padding: 6px 14px; }
+      
+      .workspace { flex-direction: column; height: auto; overflow: visible; }
+      .chart-section { width: 100%; height: 320px; min-height: 320px; flex: none; border-right: none; border-bottom: 1px solid var(--border); }
+      .analysis-panel { width: 100%; height: auto; flex: none; overflow-y: visible; }
+      .ohlc-strip { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    }
   </style>
 </head>
 <body>
 
   <header class="portal-nav">
     <div class="nav-brand">
-      <div class="brand-icon">🌐</div>
-      <div class="brand-title">MARKET INTELLIGENCE PORTAL</div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <div class="brand-icon">🌐</div>
+        <div class="brand-title">MARKET INTELLIGENCE</div>
+      </div>
+      <button class="chip" onclick="toggleColorMode()" id="colorToggleBtn">🎨 미국식(녹/적)</button>
     </div>
     <div class="search-container">
       <span class="search-icon">🔍</span>
-      <input type="text" class="search-box" id="searchInput" placeholder="종목명, 티커 검색 (예: 삼성전자, NVDA, 코스피, 브로드컴...)">
+      <input type="text" class="search-box" id="searchInput" placeholder="종목명, 티커 검색 (예: 삼성전자, NVDA, 코스피...)">
       <div class="search-dropdown" id="searchDropdown"></div>
     </div>
-    <button class="chip" onclick="toggleColorMode()" id="colorToggleBtn">🎨 미국식(녹/적)</button>
   </header>
 
   <div class="subnav-bar">
     <div class="cat-tabs">
-      <button class="cat-tab active" onclick="filterCategory('ALL')">전체 (18)</button>
-      <button class="cat-tab" onclick="filterCategory('INDEX')">🌐 지수</button>
-      <button class="cat-tab" onclick="filterCategory('US_TECH')">🇺🇸 미국 테크</button>
-      <button class="cat-tab" onclick="filterCategory('KR_GIANT')">🇰🇷 국내 대기업</button>
+      <button class="cat-tab active" onclick="filterCategory('ALL')">전체</button>
+      <button class="cat-tab" onclick="filterCategory('INDEX')">지수</button>
+      <button class="cat-tab" onclick="filterCategory('US_TECH')">미국 테크</button>
+      <button class="cat-tab" onclick="filterCategory('KR_GIANT')">국내 대기업</button>
     </div>
     <div class="ticker-chips" id="tickerChipsContainer"></div>
   </div>
@@ -148,7 +172,17 @@
 
     <div class="analysis-panel">
       <div class="panel-top">
-        <div class="panel-instruction">💡 일봉 클릭 또는 <b>⌨️ 키보드 좌우 방향키(←, →)</b>로 편리하게 일봉을 이동할 수 있습니다. (↑, ↓: 줌)</div>
+        <div class="panel-instruction">
+          💡 일봉 터치(클릭) 또는 <b>키보드 방향키(←, →)</b>로 일봉을 이동할 수 있습니다.<br>
+          스마트폰에서는 아래 <b>[◀ 이전일] [다음일 ▶]</b> 버튼을 누르면 더욱 편리합니다.
+        </div>
+
+        <div class="mobile-controls">
+          <button class="btn-nav-step" onclick="stepCandle(-1)">◀ 이전일 (어제)</button>
+          <button class="btn-nav-step" onclick="jumpToLatest()">최근일 마감</button>
+          <button class="btn-nav-step" onclick="stepCandle(1)">다음일 (내일) ▶</button>
+        </div>
+
         <div class="panel-header-row">
           <span class="panel-date" id="pDate">-</span>
           <span class="badge badge-up" id="pBadge">-</span>
@@ -160,15 +194,15 @@
       </div>
 
       <div class="ohlc-strip">
-        <div><div class="ohlc-l">시가</div><div class="ohlc-v" id="pOpen">-</div></div>
-        <div><div class="ohlc-l">고가</div><div class="ohlc-v" id="pHigh">-</div></div>
-        <div><div class="ohlc-l">저가</div><div class="ohlc-v" id="pLow">-</div></div>
-        <div><div class="ohlc-l">거래량</div><div class="ohlc-v" id="pVol">-</div></div>
+        <div><div class="ohlc-l">시가 (Open)</div><div class="ohlc-v" id="pOpen">-</div></div>
+        <div><div class="ohlc-l">고가 (High)</div><div class="ohlc-v" id="pHigh">-</div></div>
+        <div><div class="ohlc-l">저가 (Low)</div><div class="ohlc-v" id="pLow">-</div></div>
+        <div><div class="ohlc-l">거래량 (Vol)</div><div class="ohlc-v" id="pVol">-</div></div>
       </div>
 
       <div class="panel-body">
         <div class="factor-card">
-          <div class="factor-title">🎯 핵심 변동 원인</div>
+          <div class="factor-title">🎯 핵심 변동 원인 요약</div>
           <div class="factor-desc" id="pHeadline">-</div>
         </div>
         <div class="factor-card">
@@ -179,7 +213,7 @@
           <div class="pillar-item"><div class="pillar-hdr">📊 시장 수급 및 기술적 위치</div><div class="pillar-txt" id="pPillarTech">-</div></div>
         </div>
         <div class="factor-card">
-          <div class="factor-title">💡 시장 시사점</div>
+          <div class="factor-title">💡 시장 시사점 및 대응 전략</div>
           <div class="factor-desc" id="pTakeaway">-</div>
         </div>
       </div>
@@ -192,7 +226,7 @@
     let isKoreanColor = false;
     let selectedIndex = 0;
     let hoveredIndex = -1;
-    let visibleCount = 100;
+    let visibleCount = 80;
     let startIndex = 0;
     let isDragging = false, dragStartX = 0, dragStartStartIndex = 0;
 
@@ -212,7 +246,7 @@
           throw new Error('데이터 파일을 찾을 수 없습니다.');
         }
       } catch (err) {
-        console.warn('portal_database.json 로딩 대기 중...', err);
+        console.warn('portal_database.json 로딩 중...', err);
         document.getElementById('entName').innerText = "portal_database.json 로딩 중...";
       }
     }
@@ -220,41 +254,76 @@
     function initApp() {
       renderTickerChips();
       selectEntity(Object.keys(database)[0] || "AVGO");
-      setupKeyboard();
+      setupKeyboardAndTouch();
     }
 
-    // ⌨️ 키보드 방향키 조작 이벤트 등록
-    function setupKeyboard() {
-      window.addEventListener('keydown', (e) => {
-        if (!database[currentTicker]) return;
-        const series = database[currentTicker].series;
-        if (!series || series.length === 0) return;
-        if (document.activeElement === searchInput) return;
+    function stepCandle(delta) {
+      if (!database[currentTicker]) return;
+      const s = database[currentTicker].series;
+      if (!s || s.length === 0) return;
 
-        if (e.key === 'ArrowLeft') {
-          e.preventDefault();
-          if (selectedIndex > 0) {
-            selectedIndex--;
-            if (selectedIndex < startIndex) {
-              startIndex = Math.max(0, selectedIndex - 5);
+      const nextIdx = selectedIndex + delta;
+      if (nextIdx >= 0 && nextIdx < s.length) {
+        selectedIndex = nextIdx;
+        if (selectedIndex < startIndex) {
+          startIndex = Math.max(0, selectedIndex - 5);
+        } else if (selectedIndex >= startIndex + visibleCount) {
+          startIndex = Math.min(s.length - visibleCount, selectedIndex - visibleCount + 6);
+        }
+        updateAnalysisPanel(selectedIndex);
+      }
+    }
+
+    function jumpToLatest() {
+      if (!database[currentTicker]) return;
+      const s = database[currentTicker].series;
+      if (!s || s.length === 0) return;
+      selectedIndex = s.length - 1;
+      startIndex = Math.max(0, s.length - visibleCount);
+      updateAnalysisPanel(selectedIndex);
+    }
+
+    function setupKeyboardAndTouch() {
+      window.addEventListener('keydown', (e) => {
+        if (document.activeElement === searchInput) return;
+        if (e.key === 'ArrowLeft') { e.preventDefault(); stepCandle(-1); }
+        else if (e.key === 'ArrowRight') { e.preventDefault(); stepCandle(1); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); zoomIn(); }
+        else if (e.key === 'ArrowDown') { e.preventDefault(); zoomOut(); }
+      });
+
+      container.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          isDragging = true;
+          dragStartX = e.touches[0].clientX - container.getBoundingClientRect().left;
+          dragStartStartIndex = startIndex;
+        }
+      }, { passive: true });
+
+      container.addEventListener('touchmove', (e) => {
+        if (isDragging && e.touches.length === 1) {
+          const clientX = e.touches[0].clientX - container.getBoundingClientRect().left;
+          const delta = Math.round((dragStartX - clientX) / 12);
+          startIndex = Math.max(0, Math.min(database[currentTicker].series.length - visibleCount, dragStartStartIndex + delta));
+          renderChart();
+        }
+      }, { passive: true });
+
+      container.addEventListener('touchend', (e) => {
+        if (isDragging) {
+          isDragging = false;
+          if (e.changedTouches.length === 1) {
+            const clientX = e.changedTouches[0].clientX - container.getBoundingClientRect().left;
+            if (Math.abs(clientX - dragStartX) < 6) {
+              const rect = container.getBoundingClientRect();
+              const chartWidth = rect.width - 60;
+              const candleW = chartWidth / visibleCount;
+              const rel = Math.floor(clientX / candleW);
+              if (rel >= 0 && rel < visibleCount) {
+                stepCandle(startIndex + rel - selectedIndex);
+              }
             }
-            updateAnalysisPanel(selectedIndex);
           }
-        } else if (e.key === 'ArrowRight') {
-          e.preventDefault();
-          if (selectedIndex < series.length - 1) {
-            selectedIndex++;
-            if (selectedIndex >= startIndex + visibleCount) {
-              startIndex = Math.min(series.length - visibleCount, selectedIndex - visibleCount + 6);
-            }
-            updateAnalysisPanel(selectedIndex);
-          }
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          zoomIn();
-        } else if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          zoomOut();
         }
       });
     }
@@ -299,20 +368,20 @@
       document.getElementById('ent52Low').innerText = pfx + (m.currency==="USD" ? m.low_52w.toFixed(2) : Number(m.low_52w).toLocaleString()) + sfx;
       document.getElementById('entCap').innerText = m.market_cap;
       document.getElementById('entPE').innerText = m.pe;
-      document.getElementById('chartTitle').innerText = `${m.name} 1년 일봉 차트`;
+      document.getElementById('chartTitle').innerText = `${m.name} 1년 일봉`;
 
       const msWrap = document.getElementById('milestonesContainer');
       msWrap.innerHTML = "";
       (m.milestones || []).forEach(([mDate, mText]) => {
         const btn = document.createElement('button');
         btn.className = "ms-btn";
-        btn.innerText = `${mDate.substring(5)} ${mText.substring(0, 16)}...`;
+        btn.innerText = `${mDate.substring(5)} ${mText.substring(0, 14)}...`;
         btn.onclick = () => jumpToDate(mDate);
         msWrap.appendChild(btn);
       });
 
       renderTickerChips();
-      visibleCount = 100;
+      visibleCount = window.innerWidth < 768 ? 50 : 90;
       startIndex = Math.max(0, s.length - visibleCount);
       selectedIndex = s.length - 1;
 
@@ -349,7 +418,6 @@
       const meta = database[currentTicker].meta;
       const ma20 = getMA(series, 20);
       const ma60 = getMA(series, 60);
-      const ma120 = getMA(series, 120);
 
       const rect = container.getBoundingClientRect();
       const width = rect.width;
@@ -359,7 +427,7 @@
       const priceH = height * 0.73;
       const volTop = height * 0.77;
       const volH = height * 0.17;
-      const rightPadding = 75;
+      const rightPadding = 60;
       const chartWidth = width - rightPadding;
 
       const endIndex = Math.min(series.length, startIndex + visibleCount);
@@ -382,13 +450,13 @@
       const candleW = chartWidth / visibleData.length;
       const bodyW = Math.max(2, candleW * 0.7);
 
-      ctx.lineWidth = 1; ctx.strokeStyle = '#1e293b'; ctx.font = '11px sans-serif'; ctx.fillStyle = '#64748b';
-      for (let s = 0; s <= 5; s++) {
-        const val = minP + (maxP - minP) * (s / 5);
+      ctx.lineWidth = 1; ctx.strokeStyle = '#1e293b'; ctx.font = '10px sans-serif'; ctx.fillStyle = '#64748b';
+      for (let s = 0; s <= 4; s++) {
+        const val = minP + (maxP - minP) * (s / 4);
         const y = getY(val);
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(chartWidth, y); ctx.stroke();
         const fmt = meta.currency === "USD" ? "$" + val.toFixed(1) : Math.round(val).toLocaleString();
-        ctx.fillText(fmt, chartWidth + 6, y + 4);
+        ctx.fillText(fmt, chartWidth + 4, y + 4);
       }
 
       const upColor = isKoreanColor ? '#ef4444' : '#10b981';
@@ -402,7 +470,7 @@
         const color = isUp ? upColor : downColor;
 
         if (gIdx === selectedIndex) {
-          ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
+          ctx.fillStyle = 'rgba(59, 130, 246, 0.25)';
           ctx.fillRect(i * candleW, 0, candleW, height);
           ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 1.5;
           ctx.strokeRect(i * candleW, 0, candleW, height);
@@ -419,14 +487,14 @@
         ctx.fillStyle = isUp ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)';
         ctx.fillRect(x - bodyW / 2, vy, bodyW, (volTop + volH) - vy);
 
-        if (i % Math.max(1, Math.floor(visibleData.length / 7)) === 0) {
+        if (i % Math.max(1, Math.floor(visibleData.length / 5)) === 0) {
           ctx.fillStyle = '#64748b';
-          ctx.fillText(d.date.substring(5), x - 12, height - 6);
+          ctx.fillText(d.date.substring(5), x - 10, height - 4);
         }
       }
 
       function drawMA(arr, color) {
-        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 1.2;
         let s = false;
         for (let i = 0; i < visibleData.length; i++) {
           const g = startIndex + i;
@@ -437,7 +505,7 @@
         }
         ctx.stroke();
       }
-      drawMA(ma20, '#f59e0b'); drawMA(ma60, '#a855f7'); drawMA(ma120, '#10b981');
+      drawMA(ma20, '#f59e0b'); drawMA(ma60, '#a855f7');
     }
 
     function updateAnalysisPanel(idx) {
@@ -468,10 +536,10 @@
       document.getElementById('pVol').innerText = (d.volume / 1e6).toFixed(1) + 'M';
       document.getElementById('pHeadline').innerText = d.headline;
 
-      document.getElementById('pPillarCompany').innerText = isUp ? `${meta.name}의 실적 호조 및 핵심 사업부 수주 확대로 이익 가시성 개선.` : `${meta.name}의 실적 발표 후 단기 눈높이 미달 및 차익 실현 매물 출회.`;
-      document.getElementById('pPillarIndustry').innerText = isUp ? "전방 산업의 AI 및 설비투자(CapEx) 확대 기조 지속에 따른 밸류체인 수혜." : "업종 전반의 밸류에이션 부담에 따른 기술주 동반 조정.";
-      document.getElementById('pPillarMacro').innerText = isUp ? "기준금리 완화 정책 기대감 및 인플레이션 둔화로 위험선호 심리 확산." : "국채 금리 반등 및 거시경제 불확실성 노이즈로 인한 보수적 심리.";
-      document.getElementById('pPillarTech').innerText = isUp ? "외국인 및 기관 동반 순매수 유입 및 주요 지지선 반등." : "기관 손절 물량 출회 및 단기 저점 탐색 과정.";
+      document.getElementById('pPillarCompany').innerText = isUp ? `${meta.name}의 실적 호조 및 핵심 수주 모멘텀 부각으로 이익 가시성 개선.` : `${meta.name}의 단기 눈높이 미달 및 차익 실현 매물 출회.`;
+      document.getElementById('pPillarIndustry').innerText = isUp ? "전방 산업의 AI 및 설비투자(CapEx) 확대에 따른 밸류체인 수혜." : "업종 전반의 밸류에이션 부담에 따른 기술주 동반 조정.";
+      document.getElementById('pPillarMacro').innerText = isUp ? "금리 완화 기대감 및 인플레이션 둔화로 위험선호 심리 확산." : "국채 금리 반등 및 거시경제 불확실성 노이즈로 보수적 심리.";
+      document.getElementById('pPillarTech').innerText = isUp ? "외국인 및 기관 순매수 유입 및 지지선 반등." : "기관 손절 물량 출회 및 단기 저점 탐색.";
       document.getElementById('pTakeaway').innerText = isUp ? "주요 지지선 안착 후 우상향 추세 유지 여부 확인 필요." : "분할 매수 관점에서의 밸류에이션 하단 지지력 점검 유효.";
 
       renderChart();
@@ -487,13 +555,13 @@
       const series = database[currentTicker].series;
       const rect = container.getBoundingClientRect();
       const x = e.clientX - rect.left;
-      const chartWidth = rect.width - 75;
+      const chartWidth = rect.width - 60;
       const candleW = chartWidth / Math.min(series.length, visibleCount);
 
       if (Math.abs(e.clientX - rect.left - dragStartX) < 5) {
         const rel = Math.floor(x / candleW);
         if (rel >= 0 && rel < visibleCount) {
-          updateAnalysisPanel(startIndex + rel);
+          stepCandle(startIndex + rel - selectedIndex);
         }
       }
       isDragging = false;
@@ -501,7 +569,7 @@
 
     container.addEventListener('mousemove', (e) => {
       if (isDragging) {
-        const delta = Math.round((dragStartX - (e.clientX - container.getBoundingClientRect().left)) / 15);
+        const delta = Math.round((dragStartX - (e.clientX - container.getBoundingClientRect().left)) / 12);
         startIndex = Math.max(0, Math.min(database[currentTicker].series.length - visibleCount, dragStartStartIndex + delta));
         renderChart();
       }
@@ -509,7 +577,7 @@
 
     container.addEventListener('wheel', (e) => {
       e.preventDefault();
-      if (e.deltaY < 0) visibleCount = Math.max(25, visibleCount - 8);
+      if (e.deltaY < 0) visibleCount = Math.max(20, visibleCount - 8);
       else visibleCount = Math.min(database[currentTicker].series.length, visibleCount + 8);
       startIndex = Math.max(0, Math.min(database[currentTicker].series.length - visibleCount, startIndex));
       renderChart();
@@ -523,8 +591,8 @@
         updateAnalysisPanel(idx);
       }
     }
-    function resetZoom() { visibleCount = database[currentTicker].series.length; startIndex = 0; renderChart(); }
-    function zoomIn() { visibleCount = Math.max(25, Math.floor(visibleCount * 0.7)); renderChart(); }
+    function resetZoom() { visibleCount = window.innerWidth < 768 ? 50 : 90; startIndex = Math.max(0, database[currentTicker].series.length - visibleCount); renderChart(); }
+    function zoomIn() { visibleCount = Math.max(20, Math.floor(visibleCount * 0.7)); renderChart(); }
     function zoomOut() { visibleCount = Math.min(database[currentTicker].series.length, Math.floor(visibleCount * 1.3)); renderChart(); }
     function toggleColorMode() {
       isKoreanColor = !isKoreanColor;
