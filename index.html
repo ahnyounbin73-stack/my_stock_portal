@@ -513,4 +513,175 @@
       const candleW = chartWidth / visibleData.length;
       const bodyW = Math.max(2, candleW * 0.7);
 
-      ctx.lineWidth = 1; ctx.strokeStyle = '#1e293b'; ctx.font = '
+      ctx.lineWidth = 1; ctx.strokeStyle = '#1e293b'; ctx.font = '10px sans-serif'; ctx.fillStyle = '#64748b';
+      for (let s = 0; s <= 4; s++) {
+        const val = minP + (maxP - minP) * (s / 4);
+        const y = getY(val);
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(chartWidth, y); ctx.stroke();
+        const fmt = meta.currency === "USD" ? "$" + val.toFixed(1) : Math.round(val).toLocaleString();
+        ctx.fillText(fmt, chartWidth + 4, y + 4);
+      }
+
+      const upColor = isKoreanColor ? '#ef4444' : '#10b981';
+      const downColor = isKoreanColor ? '#3b82f6' : '#ef4444';
+
+      for (let i = 0; i < visibleData.length; i++) {
+        const gIdx = startIndex + i;
+        const d = visibleData[i];
+        const x = i * candleW + candleW / 2;
+        const isUp = d.close >= d.open;
+        const color = isUp ? upColor : downColor;
+
+        if (gIdx === selectedIndex) {
+          ctx.fillStyle = 'rgba(59, 130, 246, 0.25)';
+          ctx.fillRect(i * candleW, 0, candleW, height);
+          ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 1.5;
+          ctx.strokeRect(i * candleW, 0, candleW, height);
+        }
+
+        ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(x, getY(d.high)); ctx.lineTo(x, getY(d.low)); ctx.stroke();
+
+        const yO = getY(d.open), yC = getY(d.close);
+        ctx.fillStyle = color;
+        ctx.fillRect(x - bodyW / 2, Math.min(yO, yC), bodyW, Math.max(2, Math.abs(yO - yC)));
+
+        const vy = getVY(d.volume);
+        ctx.fillStyle = isUp ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)';
+        ctx.fillRect(x - bodyW / 2, vy, bodyW, (volTop + volH) - vy);
+
+        if (i % Math.max(1, Math.floor(visibleData.length / 5)) === 0) {
+          ctx.fillStyle = '#64748b';
+          ctx.fillText(d.date.substring(5), x - 10, height - 4);
+        }
+      }
+
+      function drawMA(arr, color) {
+        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 1.2;
+        let s = false;
+        for (let i = 0; i < visibleData.length; i++) {
+          const g = startIndex + i;
+          if (arr[g] != null) {
+            const x = i * candleW + candleW / 2, y = getY(arr[g]);
+            if (!s) { ctx.moveTo(x, y); s = true; } else ctx.lineTo(x, y);
+          }
+        }
+        ctx.stroke();
+      }
+      drawMA(ma20, '#f59e0b'); drawMA(ma60, '#a855f7');
+    }
+
+    function updateAnalysisPanel(idx) {
+      const series = database[currentTicker].series;
+      const meta = database[currentTicker].meta;
+      if (idx < 0 || idx >= series.length) return;
+      selectedIndex = idx;
+      const d = series[idx];
+
+      document.getElementById('pDate').innerText = d.date;
+      const pfx = meta.currency === "USD" ? "$" : "";
+      const sfx = meta.currency === "KRW" ? "원" : "";
+
+      document.getElementById('pClose').innerText = pfx + (meta.currency==="USD" ? d.close.toFixed(2) : Number(d.close).toLocaleString()) + sfx;
+
+      const isUp = d.change >= 0;
+      const diffElem = document.getElementById('pDiff');
+      diffElem.innerText = `${isUp ? '+' : ''}${pfx}${meta.currency==="USD" ? d.change.toFixed(2) : Number(d.change).toLocaleString()} (${isUp ? '+' : ''}${d.pct_change.toFixed(2)}%)`;
+      diffElem.style.color = isUp ? 'var(--up-green)' : 'var(--down-red)';
+
+      const badgeElem = document.getElementById('pBadge');
+      badgeElem.innerText = `${d.category} • ${d.sentiment}`;
+      badgeElem.className = `badge ${isUp ? 'badge-up' : 'badge-down'}`;
+
+      document.getElementById('pOpen').innerText = pfx + (meta.currency==="USD" ? d.open.toFixed(2) : Number(d.open).toLocaleString());
+      document.getElementById('pHigh').innerText = pfx + (meta.currency==="USD" ? d.high.toFixed(2) : Number(d.high).toLocaleString());
+      document.getElementById('pLow').innerText = pfx + (meta.currency==="USD" ? d.low.toFixed(2) : Number(d.low).toLocaleString());
+      document.getElementById('pVol').innerText = (d.volume / 1e6).toFixed(1) + 'M';
+      document.getElementById('pHeadline').innerText = d.headline;
+
+      document.getElementById('pPillarCompany').innerText = isUp ? `${meta.name}의 실적 호조 및 핵심 수주 모멘텀 부각으로 이익 가시성 개선.` : `${meta.name}의 단기 눈높이 미달 및 차익 실현 매물 출회.`;
+      document.getElementById('pPillarIndustry').innerText = isUp ? "전방 산업의 AI 및 설비투자(CapEx) 확대에 따른 밸류체인 수혜." : "업종 전반의 밸류에이션 부담에 따른 기술주 동반 조정.";
+      document.getElementById('pPillarMacro').innerText = isUp ? "금리 완화 기대감 및 인플레이션 둔화로 위험선호 심리 확산." : "국채 금리 반등 및 거시경제 불확실성 노이즈로 보수적 심리.";
+      document.getElementById('pPillarTech').innerText = isUp ? "외국인 및 기관 순매수 유입 및 지지선 반등." : "기관 손절 물량 출회 및 단기 저점 탐색.";
+      document.getElementById('pTakeaway').innerText = isUp ? "주요 지지선 안착 후 우상향 추세 유지 여부 확인 필요." : "분할 매수 관점에서의 밸류에이션 하단 지지력 점검 유효.";
+
+      renderChart();
+    }
+
+    container.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      dragStartX = e.clientX - container.getBoundingClientRect().left;
+      dragStartStartIndex = startIndex;
+    });
+
+    container.addEventListener('mouseup', (e) => {
+      const series = database[currentTicker].series;
+      const rect = container.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const chartWidth = rect.width - 60;
+      const candleW = chartWidth / Math.min(series.length, visibleCount);
+
+      if (Math.abs(e.clientX - rect.left - dragStartX) < 5) {
+        const rel = Math.floor(x / candleW);
+        if (rel >= 0 && rel < visibleCount) {
+          stepCandle(startIndex + rel - selectedIndex);
+        }
+      }
+      isDragging = false;
+    });
+
+    container.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        const delta = Math.round((dragStartX - (e.clientX - container.getBoundingClientRect().left)) / 12);
+        startIndex = Math.max(0, Math.min(database[currentTicker].series.length - visibleCount, dragStartStartIndex + delta));
+        renderChart();
+      }
+    });
+
+    container.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (e.deltaY < 0) visibleCount = Math.max(20, visibleCount - 8);
+      else visibleCount = Math.min(database[currentTicker].series.length, visibleCount + 8);
+      startIndex = Math.max(0, Math.min(database[currentTicker].series.length - visibleCount, startIndex));
+      renderChart();
+    });
+
+    function jumpToDate(dateStr) {
+      const s = database[currentTicker].series;
+      const idx = s.findIndex(d => d.date === dateStr);
+      if (idx !== -1) {
+        startIndex = Math.max(0, Math.min(s.length - visibleCount, Math.floor(idx - visibleCount / 2)));
+        updateAnalysisPanel(idx);
+      }
+    }
+    function resetZoom() { visibleCount = window.innerWidth < 768 ? 50 : 90; startIndex = Math.max(0, database[currentTicker].series.length - visibleCount); renderChart(); }
+    function zoomIn() { visibleCount = Math.max(20, Math.floor(visibleCount * 0.7)); renderChart(); }
+    function zoomOut() { visibleCount = Math.min(database[currentTicker].series.length, Math.floor(visibleCount * 1.3)); renderChart(); }
+    function toggleColorMode() {
+      isKoreanColor = !isKoreanColor;
+      document.getElementById('colorToggleBtn').innerText = isKoreanColor ? '🎨 한국식(적/청)' : '🎨 미국식(녹/적)';
+      updateAnalysisPanel(selectedIndex);
+    }
+
+    searchInput.addEventListener('input', (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      if (!q) { searchDropdown.style.display = 'none'; return; }
+      const matches = Object.keys(database).filter(tk => {
+        if (tk === "exchange_rates") return false;
+        const m = database[tk].meta;
+        return tk.toLowerCase().includes(q) || m.name.toLowerCase().includes(q);
+      });
+      if (matches.length === 0) { searchDropdown.style.display = 'none'; return; }
+      searchDropdown.innerHTML = matches.map(tk => `
+        <div class="search-item" onclick="selectEntity('${tk}'); searchDropdown.style.display='none'; searchInput.value='';">
+          <span><b>${database[tk].meta.name}</b> (${tk})</span>
+          <span style="font-size:11px; color:#3b82f6;">${database[tk].meta.category}</span>
+        </div>
+      `).join('');
+      searchDropdown.style.display = 'block';
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
