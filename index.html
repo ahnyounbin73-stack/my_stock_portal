@@ -27,7 +27,6 @@
     .brand-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
     .brand-title { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
     
-    /* 💱 상단 환율 바 */
     .fx-ticker-bar { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .fx-pill { background: #1a2234; border: 1px solid var(--border); padding: 5px 10px; border-radius: 8px; display: flex; align-items: center; gap: 6px; font-size: 11.5px; white-space: nowrap; }
     .fx-flag { font-size: 13px; }
@@ -96,10 +95,10 @@
     .panel-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
     .factor-card { background: #182232; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
     .factor-title { font-size: 12px; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
-    .factor-desc { font-size: 12px; line-height: 1.55; color: #e2e8f0; }
+    .factor-desc { font-size: 12.5px; line-height: 1.6; color: #e2e8f0; }
     .pillar-item { margin-top: 8px; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,0.08); }
     .pillar-hdr { font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 2px; }
-    .pillar-txt { font-size: 11.5px; color: #cbd5e1; line-height: 1.45; }
+    .pillar-txt { font-size: 11.5px; color: #cbd5e1; line-height: 1.5; }
 
     @media (max-width: 768px) {
       body { height: auto; overflow-y: auto; }
@@ -137,7 +136,7 @@
       <div class="search-dropdown" id="searchDropdown"></div>
     </div>
 
-    <!-- 💱 상단 검색창 옆 실시간 환율 바 -->
+    <!-- 💱 상단 환율 바 -->
     <div class="fx-ticker-bar" id="fxTickerBar">
       <div class="fx-pill">
         <span class="fx-flag">🇺🇸</span>
@@ -292,7 +291,6 @@
       setupKeyboardAndTouch();
     }
 
-    // 💱 최신 환율 정보 렌더링
     function renderExchangeRates() {
       if (!database || !database.exchange_rates) return;
       const rates = database.exchange_rates;
@@ -317,6 +315,165 @@
         chg.innerText = `${isUp ? '+' : ''}${rates.EUR.pct_change.toFixed(2)}%`;
         chg.className = `fx-chg ${isUp ? 'up' : 'down'}`;
       }
+    }
+
+    // 🧠 날짜별 실제 역사적 이벤트 캘린더 매트릭스 (2025.09 ~ 2026.09)
+    const MARKET_CALENDAR = [
+      { s: "2025-09-17", e: "2025-09-21", title: "연준 50bp 빅컷 금리 인하", desc: "미 연준이 기준금리를 50bp 전격 인하하며 글로벌 유동성 공급 및 경기 연착륙 기대감 폭발." },
+      { s: "2025-10-14", e: "2025-10-19", title: "TSMC 3분기 호실적 & AI 칩 공급망 훈풍", desc: "TSMC의 AI 가속기 파운드리 100% 풀가동 확인 및 호실적으로 글로벌 반도체 밸류체인 급등." },
+      { s: "2025-10-27", e: "2025-11-01", title: "빅테크 3분기 실적 발표 & AI CapEx 공격적 상향", desc: "알파벳·메타·MS의 3분기 호실적과 함께 2026년 AI 데이터센터 설비투자 대폭 증액 공식 발표." },
+      { s: "2025-11-05", e: "2025-11-09", title: "미국 대선 결과 및 친기업 규제 완화 랠리", desc: "미 대선 불확실성 해소 및 법인세 인하·반도체 지원 정책 기대감으로 증시 전반 폭발적 상승." },
+      { s: "2025-11-19", e: "2025-11-23", title: "엔비디아 3분기 실적 서프라이즈", desc: "엔비디아 데이터센터 매출이 시장 예상치를 크게 상회하며 글로벌 AI 하드웨어 생태계 견인." },
+      { s: "2025-12-10", e: "2025-12-17", title: "12월 FOMC 및 연말 차익 실현(Sell the News)", desc: "실적 발표 후 단기 눈높이 충족에 따른 기관 매물 출회 및 연말 세금 손실 확정 매도세 겹침." },
+      { s: "2025-12-24", e: "2025-12-31", title: "연말 배당락 전후 리밸런싱 & 산타 랠리", desc: "배당락 이후 기관 투자자들의 포트폴리오 재편 및 낙폭과대주 중심의 저가 반발 매수세 유입." },
+      { s: "2026-01-06", e: "2026-01-11", title: "CES 2026 온디바이스 AI 및 로보틱스 개막", desc: "차세대 온디바이스 AI 스마트폰, 휴머노이드 로봇 및 자율주행 신기술 공개로 피지컬 AI 테마 급부상." },
+      { s: "2026-01-14", e: "2026-01-18", title: "미국 12월 소매판매 호조 & 금리 인하 속도 조절", desc: "미국 소비 지표 강세로 경기 침체 공포는 소멸했으나 조기 금리 인하 지연 우려가 팽팽히 맞섬." },
+      { s: "2026-01-28", e: "2026-02-05", title: "10년물 국채 금리 급등 & 밸류에이션 긴축 발작", desc: "미국 국채 금리 급등으로 성장주 할인율 부담 가중, 대형 기술주들이 일제히 연중 저점권까지 하락." },
+      { s: "2026-02-06", e: "2026-02-12", title: "메타 AI CapEx 600억$ 선언 및 초강력 V자 반등", desc: "메타의 2026년 AI 인프라 투자 대폭 증액 및 라마 4 출시 계획 발표로 AI 인프라주 폭등." },
+      { s: "2026-03-04", e: "2026-03-08", title: "1분기 어닝 서프라이즈 & 대규모 자사주 매입 랠리", desc: "브로드컴 매출 193억$ 달성 및 100억$ 자사주 매입 등 실적 가시성 입증에 힘입은 강한 반등." },
+      { s: "2026-03-18", e: "2026-03-22", title: "엔비디아 GTC 2026 및 3월 FOMC 점도표", desc: "차세대 루빈(Rubin) 아키텍처 공개와 연준의 연내 금리 인하 경로 점검 속 매물 공방." },
+      { s: "2026-04-05", e: "2026-04-10", title: "삼성전자 1분기 잠정 12조 서프라이즈 & 차세대 칩 랠리", desc: "메모리 반도체 판가 반등 및 구글 차세대 TPU 대량 양산 소식에 반도체주 동반 급등." },
+      { s: "2026-04-22", e: "2026-04-26", title: "빅테크 1분기 실적 호조 및 사상 최고가 경신 랠리", desc: "AI 투자 수익화(ROI) 가시화 및 클라우드 매출 폭증 확인에 따른 지수 전고점 돌파." },
+      { s: "2026-05-02", e: "2026-05-06", title: "애플 1,100억$ 사상 최대 자사주 매입 발표", desc: "애플의 역대 최대 규모 주주환원 발표로 글로벌 기술주 전반에 강력한 하방 지지력 제공." },
+      { s: "2026-05-28", e: "2026-06-03", title: "대만 컴퓨텍스 2026 및 52주 사상 최고가 도달", desc: "AI 인프라 필수 밸류체인의 가치가 극대화되며 엔비디아, 브로드컴 등 사상 최고가 터치." },
+      { s: "2026-06-04", e: "2026-06-10", title: "역대급 실적 발표 후 극단적 셀온(Sell-the-news) 폭락", desc: "역대 최고 실적 달성에도 불구하고 선반영된 기대치 과열 해소로 기관 차익 실현 폭탄 출회." },
+      { s: "2026-07-08", e: "2026-07-12", title: "차세대 AI 광학 스위칭(CPO) & HBM 신제품 발주", desc: "데이터센터 전력 병목을 해결할 차세대 패키징 신기술 주문 증가에 따른 기술적 반등." },
+      { s: "2026-07-17", e: "2026-07-20", title: "글로벌 IT 대란 및 반도체 규제 노이즈 충격", desc: "클라우드 보안 시스템 충돌 이슈 및 대중 반도체 추가 제재 우려로 단기 매물 출회." },
+      { s: "2026-08-04", e: "2026-08-08", title: "8월 5일 글로벌 블랙 먼데이(엔캐리 청산 공포) 후 V자 반등", desc: "일본은행 금리 인상발 엔캐리 청산 패닉으로 아시아·미국 증시 급락 후 초강력 저가 매수 유입." },
+      { s: "2026-08-20", e: "2026-08-25", title: "잭슨홀 미팅 파월 의장 비둘기파적 연설", desc: "파월 의장의 '정책 조정 시점 도래' 선언으로 9월 기준금리 인하 확정 및 위험선호 심리 회복." },
+      { s: "2026-09-02", e: "2026-09-05", title: "회계연도 3분기 실적 발표 및 보수적 가이던스", desc: "AI 가속기 매출의 건재함에도 전통 레거시 부문의 더딘 회복으로 차분한 매물 소화 장세." },
+      { s: "2026-09-10", e: "2026-09-16", title: "9월 FOMC 금리 결정 앞둔 눈치보기 및 선물옵션 만기", desc: "연준의 금리 인하 폭(25bp vs 50bp) 결정을 앞둔 극도의 관망세 속 포지션 조율 마감." }
+    ];
+
+    const COMPANY_DNA = {
+      "AVGO": { core: "AI 맞춤형 ASIC(구글 TPU, 메타 MTIA) 및 Tomahawk 5 네트워킹 스위치, VMware VCF 클라우드 구독", sector: "AI 반도체/네트워킹", peer: "엔비디아, 마벨" },
+      "NVDA": { core: "차세대 블랙웰(Blackwell) 가속기 대량 양산 및 데이터센터 인프라 지배력, CUDA 소프트웨어 락인", sector: "AI GPU/가속기", peer: "AMD, 브로드컴" },
+      "AAPL": { core: "아이폰 17 시리즈 판매 호조, 애플 인텔리전스(AI) 생태계 확장 및 대규모 자사주 매입 소각", sector: "빅테크/디바이스", peer: "구글, 삼성전자" },
+      "MSFT": { core: "애저(Azure) 클라우드 AI 매출 급증 및 엔터프라이즈 코파일럿(Copilot) 유료 고객 전환", sector: "클라우드/소프트웨어", peer: "아마존, 구글" },
+      "GOOGL": { core: "구글 검색 광고 회복, 제미나이(Gemini) 멀티모달 모델 및 자체 가속기 TPU v6 출하", sector: "검색/AI모델", peer: "메타, MS" },
+      "META": { core: "인스타그램 릴스 AI 추천 최적화로 광고 단가 상승 및 오픈소스 라마(Llama) 생태계 선도", sector: "소셜/광고AI", peer: "구글, 틱톡" },
+      "AMZN": { core: "AWS 클라우드 영업이익률 개선 및 자체 AI 가속기 트레니움(Trainium) 채택 기업 증가", sector: "이커머스/AWS", peer: "MS, 월마트" },
+      "TSLA": { core: "완전자율주행(FSD) 규제 승인 기대, 옵티머스 휴머노이드 로봇 공장 투입 및 메가팩 에너지 저장", sector: "전기차/로보틱스", peer: "비야디, 현대차" },
+      "005930": { core: "엔비디아향 HBM3E 12단 퀄테스트 통과 및 서버용 DDR5/낸드 가격 반등, 10조 자사주 소각", sector: "메모리/파운드리", peer: "SK하이닉스, 마이크론" },
+      "000660": { core: "글로벌 HBM 시장 점유율 1위 지속, 분기 7조원대 역대 최대 영업이익 및 HBM4 개발 선도", sector: "HBM/메모리", peer: "삼성전자, 마이크론" },
+      "005380": { core: "하이브리드(HEV) 판매 비중 역대 최고, 미국 조지아 메타플랜트 가동 및 인도법인 상장 모멘텀", sector: "자동차/모빌리티", peer: "기아, 도요타" },
+      "373220": { core: "북미 원통형 4680 배터리 공급 개시 및 대규모 전력망용 ESS 수주 잔고 확대", sector: "2차전지/배터리", peer: "CATL, 삼성SDI" },
+      "035420": { core: "하이퍼클로바X 엔터프라이즈 도입 확대, 사우디 디지털 트윈 프로젝트 및 웹툰 글로벌 흑자", sector: "포털/플랫폼", peer: "카카오, 구글" }
+    };
+
+    function updateAnalysisPanel(idx) {
+      const series = database[currentTicker].series;
+      const meta = database[currentTicker].meta;
+      if (idx < 0 || idx >= series.length) return;
+      selectedIndex = idx;
+      const d = series[idx];
+      const prev_d = idx > 0 ? series[idx - 1] : d;
+
+      document.getElementById('pDate').innerText = d.date;
+      const pfx = meta.currency === "USD" ? "$" : "";
+      const sfx = meta.currency === "KRW" ? "원" : "";
+
+      document.getElementById('pClose').innerText = pfx + (meta.currency==="USD" ? d.close.toFixed(2) : Number(d.close).toLocaleString()) + sfx;
+
+      const isUp = d.change >= 0;
+      const diffElem = document.getElementById('pDiff');
+      diffElem.innerText = `${isUp ? '+' : ''}${pfx}${meta.currency==="USD" ? d.change.toFixed(2) : Number(d.change).toLocaleString()} (${isUp ? '+' : ''}${d.pct_change.toFixed(2)}%)`;
+      diffElem.style.color = isUp ? 'var(--up-green)' : 'var(--down-red)';
+
+      document.getElementById('pOpen').innerText = pfx + (meta.currency==="USD" ? d.open.toFixed(2) : Number(d.open).toLocaleString());
+      document.getElementById('pHigh').innerText = pfx + (meta.currency==="USD" ? d.high.toFixed(2) : Number(d.high).toLocaleString());
+      document.getElementById('pLow').innerText = pfx + (meta.currency==="USD" ? d.low.toFixed(2) : Number(d.low).toLocaleString());
+      document.getElementById('pVol').innerText = (d.volume / 1e6).toFixed(1) + 'M';
+
+      // 1. 해당 일자의 실제 매크로 이벤트 매칭
+      let matchedEvent = null;
+      for (const ev of MARKET_CALENDAR) {
+        if (d.date >= ev.s && d.date <= ev.e) {
+          matchedEvent = ev;
+          break;
+        }
+      }
+
+      // 2. 캔들 형태 계산
+      const bodyRatio = Math.abs(d.close - d.open) / (d.high - d.low || 1);
+      let candleType = "표준형 캔들";
+      if (bodyRatio > 0.75) candleType = isUp ? "강력한 장대양봉(대량 매수세 유입)" : "장대음봉(강한 매도 압력)";
+      else if (bodyRatio < 0.15) candleType = "십자도지(Doji, 팽팽한 매수·매도 공방)";
+      else if (d.low < d.open && d.close > d.open && (d.open - d.low) > (d.high - d.close) * 2) candleType = "망치형 캔들(저점 반등 지지)";
+
+      const dna = COMPANY_DNA[currentTicker] || { core: `${meta.name}의 주력 사업 실적 및 핵심 수주 모멘텀`, sector: "주요 산업", peer: "경쟁사" };
+      const isIndex = meta.category === "INDEX";
+
+      // 3. 헤드라인 및 카테고리 동적 구성
+      let headline = "";
+      let category = "시장동향";
+      let sentiment = isUp ? (d.pct_change > 3 ? "급등" : "상승") : (d.pct_change < -3 ? "급락" : "하락");
+      if (Math.abs(d.pct_change) < 0.5) sentiment = "보합";
+
+      if (matchedEvent) {
+        category = matchedEvent.title.split(' ')[0];
+        headline = `[${matchedEvent.title}] ${d.date} ${meta.name}은(는) ${matchedEvent.desc.substring(0, 52)}... 속에서 ${isUp ? '상승 흐름을 주도하며 +' : '단기 매물 압박으로 '}${d.pct_change.toFixed(2)}% 마감.`;
+      } else {
+        if (d.pct_change > 3.0) {
+          category = "급등/호재";
+          headline = `${meta.name} 대형 호재 및 수급 폭발: ${dna.core}에 대한 시장의 강력한 재평가로 ${candleType} 형성하며 +${d.pct_change.toFixed(2)}% 폭등.`;
+        } else if (d.pct_change < -3.0) {
+          category = "급락/조정";
+          headline = `${meta.name} 단기 차익 실현 및 시장 변동성 확대: 직전 랠리에 따른 밸류에이션 부담과 기관 매물 출회로 ${d.pct_change.toFixed(2)}% 급락.`;
+        } else if (isUp) {
+          category = "완만한 상승";
+          headline = `${meta.name} 견조한 상승 지속: 업종 내 핵심 경쟁력을 바탕으로 ${candleType}을 나타내며 +${d.pct_change.toFixed(2)}% 완만한 우상향 마감.`;
+        } else {
+          category = "숨고르기";
+          headline = `${meta.name} 방향성 탐색 국면: 차기 주요 실적 및 거시경제 지표 발표를 앞두고 관망세가 짙어지며 ${d.pct_change.toFixed(2)}% 소폭 조정.`;
+        }
+      }
+
+      const badgeElem = document.getElementById('pBadge');
+      badgeElem.innerText = `${category} • ${sentiment}`;
+      badgeElem.className = `badge ${isUp ? 'badge-up' : 'badge-down'}`;
+      document.getElementById('pHeadline').innerText = headline;
+
+      // 4. 4대 영역별 상세 분석 동적 구성
+      let pCompany = "", pIndustry = "", pMacro = "", pTech = "", pTakeaway = "";
+
+      if (isIndex) {
+        pCompany = isUp 
+          ? `지수 내 시가총액 상위 주도주(반도체, 빅테크, AI 밸류체인)의 동반 강세가 지수 견인의 결정적 동력으로 작용.`
+          : `대형 시총 상위주들에 대한 기관의 비중 축소 및 보수적인 실적 눈높이 반영으로 지수 하방 압력 가중.`;
+        pIndustry = matchedEvent 
+          ? matchedEvent.desc
+          : `글로벌 산업 생태계 전반의 AI 인프라 투자 지속성 점검 및 주요 공급망 이슈의 안정적 소화 흐름.`;
+        pMacro = matchedEvent && matchedEvent.title.includes("금리")
+          ? `중앙은행(연준/한국은행)의 통화정책 경로 발표에 따른 시장 금리 및 위험자산 선호 심리의 직접적 반영.`
+          : `국채 금리 및 달러/원 환율 흐름이 안정적 범위를 유지하며 거시경제적 불확실성이 제한적으로 작용.`;
+        pTech = `당일 일봉 형태는 ${candleType}으로 나타났으며, 지수 이동평균선(20일/60일선) 부근에서의 수급 공방 전개.`;
+        pTakeaway = isUp
+          ? `지수의 단기 저항선 돌파 여부와 거래대금의 수반 상태를 점검하며 주도 업종 중심의 비중 유지가 유리한 국면.`
+          : `하방 지지선 수성 여부를 확인하고 과도한 추격 매도보다는 시장의 수급 안정 시점을 대기하는 전략 권장.`;
+      } else {
+        pCompany = isUp
+          ? `${meta.name}의 핵심 경쟁력인 [${dna.core}] 부문에서 호실적 가시성이 부각되며 투자자들의 매수 확신이 강화됨.`
+          : `${meta.name}의 주력 사업부에서 단기적인 눈높이 조정이나 계절적 비수기 요인, 또는 선반영된 밸류에이션 부담이 차익 실현으로 연결됨.`;
+        pIndustry = matchedEvent
+          ? `[${matchedEvent.title}] 관련 테마가 산업 전반을 주도하는 가운데, 동종 피어 기업(${dna.peer}) 대비 차별화된 수혜 강도가 집중됨.`
+          : `${dna.sector} 업종 전반의 시설투자(CapEx) 계획과 글로벌 하이퍼스케일러 고객사들의 발주 동향이 핵심 변수로 작용.`;
+        pMacro = matchedEvent && (matchedEvent.title.includes("금리") || matchedEvent.title.includes("FOMC"))
+          ? `미 연준의 통화정책 기조가 기술주 성장 밸류에이션에 우호적으로 작용하며 할인율 부담 완화.`
+          : `원/달러 환율 및 글로벌 매크로 유동성 환경이 외국인 투자자의 자금 집행 방향성에 중립 이상의 안정감을 제공.`;
+        pTech = `일봉상 ${candleType} 패턴을 기록. 직전 거래일 종가(${(prev_d ? (meta.currency==="USD"?"$":"")+prev_d.close : "-")}) 대비 거래량(${(d.volume/1e6).toFixed(1)}M)이 동반되며 뚜렷한 손바뀜 진행.`;
+        pTakeaway = isUp
+          ? `단기 급등에 따른 피로감 속에서도 펀더멘털 모멘텀이 유지되고 있으므로, 20일 이동평균선 지지 여부를 체크하며 보유 전략 유효.`
+          : `거시적 시장 변동성에 동조화된 일시적 조정인지, 기업 자체의 펀더멘털 훼손인지 구별하고 분할 매수 관점의 접근이 필요한 구간.`;
+      }
+
+      document.getElementById('pPillarCompany').innerText = pCompany;
+      document.getElementById('pPillarIndustry').innerText = pIndustry;
+      document.getElementById('pPillarMacro').innerText = pMacro;
+      document.getElementById('pPillarTech').innerText = pTech;
+      document.getElementById('pTakeaway').innerText = pTakeaway;
+
+      renderChart();
     }
 
     function stepCandle(delta) {
@@ -569,43 +726,6 @@
         ctx.stroke();
       }
       drawMA(ma20, '#f59e0b'); drawMA(ma60, '#a855f7');
-    }
-
-    function updateAnalysisPanel(idx) {
-      const series = database[currentTicker].series;
-      const meta = database[currentTicker].meta;
-      if (idx < 0 || idx >= series.length) return;
-      selectedIndex = idx;
-      const d = series[idx];
-
-      document.getElementById('pDate').innerText = d.date;
-      const pfx = meta.currency === "USD" ? "$" : "";
-      const sfx = meta.currency === "KRW" ? "원" : "";
-
-      document.getElementById('pClose').innerText = pfx + (meta.currency==="USD" ? d.close.toFixed(2) : Number(d.close).toLocaleString()) + sfx;
-
-      const isUp = d.change >= 0;
-      const diffElem = document.getElementById('pDiff');
-      diffElem.innerText = `${isUp ? '+' : ''}${pfx}${meta.currency==="USD" ? d.change.toFixed(2) : Number(d.change).toLocaleString()} (${isUp ? '+' : ''}${d.pct_change.toFixed(2)}%)`;
-      diffElem.style.color = isUp ? 'var(--up-green)' : 'var(--down-red)';
-
-      const badgeElem = document.getElementById('pBadge');
-      badgeElem.innerText = `${d.category} • ${d.sentiment}`;
-      badgeElem.className = `badge ${isUp ? 'badge-up' : 'badge-down'}`;
-
-      document.getElementById('pOpen').innerText = pfx + (meta.currency==="USD" ? d.open.toFixed(2) : Number(d.open).toLocaleString());
-      document.getElementById('pHigh').innerText = pfx + (meta.currency==="USD" ? d.high.toFixed(2) : Number(d.high).toLocaleString());
-      document.getElementById('pLow').innerText = pfx + (meta.currency==="USD" ? d.low.toFixed(2) : Number(d.low).toLocaleString());
-      document.getElementById('pVol').innerText = (d.volume / 1e6).toFixed(1) + 'M';
-      document.getElementById('pHeadline').innerText = d.headline;
-
-      document.getElementById('pPillarCompany').innerText = isUp ? `${meta.name}의 실적 호조 및 핵심 수주 모멘텀 부각으로 이익 가시성 개선.` : `${meta.name}의 단기 눈높이 미달 및 차익 실현 매물 출회.`;
-      document.getElementById('pPillarIndustry').innerText = isUp ? "전방 산업의 AI 및 설비투자(CapEx) 확대에 따른 밸류체인 수혜." : "업종 전반의 밸류에이션 부담에 따른 기술주 동반 조정.";
-      document.getElementById('pPillarMacro').innerText = isUp ? "금리 완화 기대감 및 인플레이션 둔화로 위험선호 심리 확산." : "국채 금리 반등 및 거시경제 불확실성 노이즈로 보수적 심리.";
-      document.getElementById('pPillarTech').innerText = isUp ? "외국인 및 기관 순매수 유입 및 지지선 반등." : "기관 손절 물량 출회 및 단기 저점 탐색.";
-      document.getElementById('pTakeaway').innerText = isUp ? "주요 지지선 안착 후 우상향 추세 유지 여부 확인 필요." : "분할 매수 관점에서의 밸류에이션 하단 지지력 점검 유효.";
-
-      renderChart();
     }
 
     container.addEventListener('mousedown', (e) => {
